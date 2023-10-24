@@ -3,4 +3,4 @@ Repositorio para trabajo practico de Programación Web 3 de la Universidad de La
 
 Este proyecto implementa la tecnologia Oauth2.0 con el protocolo OpenID como una prueba de concepto de estos
 
-##[Teoria](https://drive.google.com/drive/folders/1rzrl-RDfROZzGEkKoVLwHuis2XVqfbnr?usp=sharing)
+## [Teoria](https://drive.google.com/drive/folders/1rzrl-RDfROZzGEkKoVLwHuis2XVqfbnr?usp=sharing)
