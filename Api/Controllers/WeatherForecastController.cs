@@ -5,7 +5,7 @@ namespace Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Roles = "Nuevo")]
+    [Authorize(Roles = "Admin")] /* probar con otro rol para que de Unauthorize */
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]

@@ -17,7 +17,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
-        Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
+        Description = "Standard Authorization header using the Bearer scheme (\"Bearer {token}\")",
         In = ParameterLocation.Header,
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey
@@ -27,7 +27,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options => {
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Token").Value)),
@@ -35,6 +35,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     ValidateAudience = false,
                 };
             });
+
+//var timeZoneSetting = builder.Configuration["TimeZoneSettings"];
+//var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneSetting);
+//builder.Services.AddSingleton<TimeZoneInfo>(timeZone);
 
 
 var app = builder.Build();
