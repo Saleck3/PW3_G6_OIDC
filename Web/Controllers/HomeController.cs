@@ -15,6 +15,7 @@ namespace Web.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.jwt = Request.Cookies["jwt"];
             return View();
         }
 

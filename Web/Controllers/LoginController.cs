@@ -1,29 +1,43 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
+using System.Net.Http.Headers;
+using Web.Entidades;
 using Web.Models;
 
-namespace Web.Controllers
+namespace Web.Controllers;
+
+public class LoginController : ControllerGenerico
 {
-    public class LoginController : Controller
+    public LoginController(ILogger<LoginController> logger, IConfiguration configuration) : base(logger, configuration)
     {
-        private readonly ILogger<LoginController> _logger;
+    }
 
-        public LoginController(ILogger<LoginController> logger)
+    public IActionResult Index()
+    {
+        return View(new Usuario());
+    }
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Index(Usuario usuario)
+    {
+        if (!ModelState.IsValid)
         {
-            _logger = logger;
+            return View(usuario);
         }
 
-        public IActionResult Index()
-        {
-            return View(new Usuario());
-        }
+        HttpResponseMessage response = await _client.PostAsJsonAsync("Auth/login", usuario);
+        response.EnsureSuccessStatusCode();
 
-        
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
+        string token = await response.Content.ReadFromJsonAsync<string>();
+        return RedirectToAction("Index", "Home");
     }
 }

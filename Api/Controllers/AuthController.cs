@@ -32,7 +32,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("Registro")]
-    public async Task<ActionResult<Usuario>> Registro(UsuarioDto request)
+    public ActionResult<Usuario> Registro(UsuarioDto request)
     {
         try
         {
@@ -44,12 +44,12 @@ public class AuthController : ControllerBase
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message) ;
+            return BadRequest(e.Message);
         }
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<string>> Login(UsuarioDto request)
+    public ActionResult<string> Login(UsuarioDto request)
     {
         Usuario user = (Usuario)_usuariosServicio.Filtrar(request.Username).First();
         if (user == null)
@@ -100,7 +100,7 @@ public class AuthController : ControllerBase
 
 
     [HttpPost("refresh-token")]
-    public async Task<ActionResult<string>> RefreshToken(Usuario user)
+    public ActionResult<string> RefreshToken(Usuario user)
     {
         var refreshToken = Request.Cookies["refreshToken"];
         if (!user.Refreshtoken.Equals(refreshToken))

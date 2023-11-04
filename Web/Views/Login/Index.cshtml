@@ -1,15 +1,10 @@
-﻿@model Usuario;
-
+﻿@using Web.Entidades;
+@model Usuario;
 @{
     ViewData["Title"] = "Login";
-}
-
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
     Layout = null;
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +18,7 @@
           integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
           crossorigin="anonymous" />
 </head>
+
 <body class="bg-info d-flex justify-content-center align-items-center vh-100">
     <div class="bg-white p-5 rounded-5 text-secondary shadow"
          style="width: 25rem">
@@ -32,40 +28,45 @@
                  style="height: 7rem" />
         </div>
         <div class="text-center fs-1 fw-bold">Login</div>
-        <div class="input-group mt-4">
-            <div class="input-group-text bg-info">
-                <img src="/assets/username-icon.svg"
-                     alt="username-icon"
-                     style="height: 1rem" />
+        <form asp-action="Index">
+            <span asp-validation-for="Username" class="text-danger"></span>
+            <div class="input-group mt-4">
+                <div class="input-group-text bg-info">
+                    <img src="/assets/username-icon.svg"
+                         alt="username-icon"
+                         style="height: 1rem" />
+                </div>
+                <input class="form-control bg-light"
+                       type="text"
+                       placeholder="Username" value="@Model.Username" asp-for="Username" />
+
             </div>
-            <input class="form-control bg-light"
-                   type="text"
-                   placeholder="Username" value="@Model.Username"/>
-        </div>
-        <div class="input-group mt-1">
-            <div class="input-group-text bg-info">
-                <img src="/assets/password-icon.svg"
-                     alt="password-icon"
-                     style="height: 1rem" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+            <div class="input-group mt-1">
+                <div class="input-group-text bg-info">
+                    <img src="/assets/password-icon.svg"
+                         alt="password-icon"
+                         style="height: 1rem" />
+                </div>
+                <input class="form-control bg-light"
+                       type="password"
+                       placeholder="Password" asp-for="Password" value="@Model.Password" />
             </div>
-            <input class="form-control bg-light"
-                   type="password"
-                   placeholder="Password" value="@Model.Password" />
-        </div>
-        <div class="d-flex justify-content-around mt-1">
-            <div class="d-flex align-items-center gap-1">
-                <input class="form-check-input" type="checkbox" />
-                <div class="pt-1" style="font-size: 0.9rem">Remember me</div>
+            <div class="d-flex justify-content-around mt-1">
+                <div class="d-flex align-items-center gap-1">
+                    <input class="form-check-input" type="checkbox" />
+                    <div class="pt-1" style="font-size: 0.9rem">Remember me</div>
+                </div>
+                <div class="pt-1">
+                    <a href="#"
+                       class="text-decoration-none text-info fw-semibold fst-italic"
+                       style="font-size: 0.9rem">Forgot your password?</a>
+                </div>
             </div>
-            <div class="pt-1">
-                <a href="#"
-                   class="text-decoration-none text-info fw-semibold fst-italic"
-                   style="font-size: 0.9rem">Forgot your password?</a>
-            </div>
-        </div>
-        <div class="btn btn-info text-white w-100 mt-4 fw-semibold shadow-sm">
-            Login
-        </div>
+            <button type="submit" class="btn btn-info text-white w-100 mt-4 fw-semibold shadow-sm">
+                Login
+            </button>
+        </form>
         <div class="d-flex gap-1 justify-content-center mt-1">
             <div>Don't have an account?</div>
             <a href="./Registro/Registro" class="text-decoration-none text-info fw-semibold">Register</a>
@@ -82,5 +83,6 @@
             <div class="fw-semibold text-secondary">Continue with Google</div>
         </div>
     </div>
+
 </body>
 </html>
