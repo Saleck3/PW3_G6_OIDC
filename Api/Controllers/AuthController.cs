@@ -22,15 +22,17 @@ namespace Api.Controllers
         
         private readonly IConfiguration _configuration;
         private IUsuarioServicio _usuariosServicio;
+        private IIngresoServicio _ingresoServicio;
         //private readonly TimeZoneInfo _timeZone;
 
 
-        public AuthController(IConfiguration configuration, IUsuarioServicio uServicio)//, IUserService userService)
+        public AuthController(IConfiguration configuration, IUsuarioServicio uServicio, IIngresoServicio iServicio)//, IUserService userService)
         {
             _configuration = configuration;
             //_userService = userService;
             //_timeZone = timeZone;
             _usuariosServicio = uServicio;
+            _ingresoServicio = iServicio;
         }
         
         [HttpPost("Registro")]
@@ -62,6 +64,8 @@ namespace Api.Controllers
             {
                 return BadRequest("Wrong password.");
             }
+
+            RegistrarIngreso(ref user);
 
             string token = CreateToken(ref user);
 
@@ -135,6 +139,14 @@ namespace Api.Controllers
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(user.Passwordhash);
             }
+        }
+
+        private void RegistrarIngreso(ref Usuario user)
+        {
+            Ingreso ingreso = new Ingreso();
+            ingreso.UserId = user.Id;
+            ingreso.User = user;
+            _ingresoServicio.Crear(ingreso);
         }
 
         private string CreateToken(ref Usuario usuario)
