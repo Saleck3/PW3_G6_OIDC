@@ -8,6 +8,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
+using Api.Logica;
+using Api.EF;
+using System.Collections;
+using System.Text;
 
 namespace Api.Controllers
 {
@@ -15,47 +19,58 @@ namespace Api.Controllers
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        public static Usuario usuario = new Usuario();
+        
         private readonly IConfiguration _configuration;
+        private IUsuarioServicio _usuariosServicio;
+        private IIngresoServicio _ingresoServicio;
         //private readonly TimeZoneInfo _timeZone;
 
 
-        public AuthController(IConfiguration configuration)//, IUserService userService)
+        public AuthController(IConfiguration configuration, IUsuarioServicio uServicio, IIngresoServicio iServicio)//, IUserService userService)
         {
             _configuration = configuration;
             //_userService = userService;
             //_timeZone = timeZone;
-
+            _usuariosServicio = uServicio;
+            _ingresoServicio = iServicio;
         }
-
+        
         [HttpPost("Registro")]
         public async Task<ActionResult<Usuario>> Registro(UsuarioDto request)
         {
-            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            usuario.Username = request.Username;
-            usuario.PasswordSalt = passwordSalt;
-            usuario.PasswordHash = passwordHash;
-            return Ok(usuario);
-
+            try
+            {
+                Usuario user = new Usuario();
+                CreatePasswordHash(request.Password, ref user);
+                user.Username = request.Username;
+                _usuariosServicio.Crear(user);
+                return Ok(user);
+            }
+            catch (Exception ) {
+                return BadRequest("User Exists.");
+            }
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(UsuarioDto request)
         {
-            if (usuario.Username != request.Username)
+            Usuario user = (Usuario)_usuariosServicio.Filtrar(request.Username).First();
+            if (user == null)
             {
                 return BadRequest("User not found.");
             }
 
-            if (!VerifyPasswordHash(request.Password, usuario.PasswordHash, usuario.PasswordSalt))
+            if (!VerifyPasswordHash(request.Password, ref user))
             {
                 return BadRequest("Wrong password.");
             }
 
-            string token = CreateToken(usuario);
+            RegistrarIngreso(ref user);
+
+            string token = CreateToken(ref user);
 
             var refreshToken = GenerateRefreshToken();
-            SetRefreshToken(refreshToken);
+            SetRefreshToken(refreshToken, ref user);
 
             return Ok(token);
         }
@@ -72,7 +87,7 @@ namespace Api.Controllers
             return refreshToken;
         }
 
-        private void SetRefreshToken(RefreshToken nuevoRefreshToken)
+        private void SetRefreshToken(RefreshToken nuevoRefreshToken, ref Usuario user)
         {
             var cookieOptions = new CookieOptions
             {
@@ -81,49 +96,60 @@ namespace Api.Controllers
             };
 
             Response.Cookies.Append("refreshToken", nuevoRefreshToken.Token, cookieOptions);
-            usuario.RefreshToken = nuevoRefreshToken.Token;
-            usuario.TokenCreated = nuevoRefreshToken.Created;
-            usuario.TokenExpires = nuevoRefreshToken.Expires;
+            user.Refreshtoken = nuevoRefreshToken.Token;
+            user.Tokencreated = nuevoRefreshToken.Created;
+            user.Tokenexpires = nuevoRefreshToken.Expires;
         }
 
  
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<string>> RefreshToken()
+        public async Task<ActionResult<string>> RefreshToken(Usuario user)
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            if (!usuario.RefreshToken.Equals(refreshToken))
+            if (!user.Refreshtoken.Equals(refreshToken))
             {
                 return Unauthorized("Refresh Token inválido");
-            }else if(usuario.TokenExpires < DateTime.Now)
+            }else if(user.Tokenexpires < DateTime.Now)
             {
                 return Unauthorized("El token expiró");
             }
 
-            string token = CreateToken(usuario);
+            string token = CreateToken(ref user);
             var nuevoRefreshToken = GenerateRefreshToken();
-            SetRefreshToken(nuevoRefreshToken);
+            SetRefreshToken(nuevoRefreshToken, ref user);
             return Ok(token);
         }
 
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        private void CreatePasswordHash(string password, ref Usuario usuario)
         {
+            
             using (var hmac = new HMACSHA512())
             {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                usuario.Passwordsalt = hmac.Key;
+                usuario.Passwordhash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
+
+            usuario.Password = Encoding.UTF8.GetString(usuario.Passwordhash); 
         }
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        private bool VerifyPasswordHash(string password, ref Usuario user)
         {
-            using (var hmac = new HMACSHA512(passwordSalt))
+            using (var hmac = new HMACSHA512(user.Passwordsalt))
             {
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);
+                return computedHash.SequenceEqual(user.Passwordhash);
             }
         }
 
-        private string CreateToken(Usuario usuario)
+        private void RegistrarIngreso(ref Usuario user)
+        {
+            Ingreso ingreso = new Ingreso();
+            ingreso.UserId = user.Id;
+            ingreso.User = user;
+            _ingresoServicio.Crear(ingreso);
+        }
+
+        private string CreateToken(ref Usuario usuario)
         {
             List<Claim> claims = new List<Claim>
             {

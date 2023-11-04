@@ -1,4 +1,8 @@
 {
+  /*Scaffold-DbContext 'Name=ConnectionStrings:web' Microsoft.EntityFrameworkCore.SqlServer -OutputDir EF -Force*/
+  "ConnectionStrings": {
+    "web": "Server=.\\SQLExpress;Database=web;Trusted_Connection=True;Encrypt=False"
+  },
   "Token": "https://github.com/Saleck3/PW3_G6_OIDC aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "Logging": {
     "LogLevel": {
