@@ -8,9 +8,8 @@ using Api.Logica;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<WebContext>();
@@ -29,7 +28,8 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options => {
+            .AddJwtBearer(options =>
+            {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -39,10 +39,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 };
             });
 
+
 //var timeZoneSetting = builder.Configuration["TimeZoneSettings"];
 //var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneSetting);
 //builder.Services.AddSingleton<TimeZoneInfo>(timeZone);
 
+builder.Services.AddDbContext<WebContext>();
 
 var app = builder.Build();
 

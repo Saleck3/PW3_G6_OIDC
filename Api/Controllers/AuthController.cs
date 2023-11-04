@@ -42,9 +42,9 @@ public class AuthController : ControllerBase
             _usuariosServicio.Crear(user);
             return Ok(user);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            return BadRequest("User Exists.");
+            return BadRequest(e.Message) ;
         }
     }
 
