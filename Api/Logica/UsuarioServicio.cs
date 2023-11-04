@@ -43,10 +43,10 @@ namespace Api.Logica
 
         public void Eliminar(int id)
         {
-            var sucursal = _contexto.Users.Find(id);
+            var sucursal = _contexto.Usuarios.Find(id);
             if (sucursal != null)
             {
-                _contexto.Users.Remove(sucursal);
+                _contexto.Usuarios.Remove(sucursal);
                 _contexto.SaveChanges();
             }
         }

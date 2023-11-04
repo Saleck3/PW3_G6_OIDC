@@ -44,7 +44,7 @@ namespace Api.Controllers
                 _usuariosServicio.Crear(user);
                 return Ok(user);
             }
-            catch (Exception e) {
+            catch (Exception ) {
                 return BadRequest("User Exists.");
             }
         }
