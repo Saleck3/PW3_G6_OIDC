@@ -10,6 +10,7 @@ namespace Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles = "admin")]
     public class HomeController : ControllerBase
     {
         private readonly IConfiguration _configuration;
@@ -31,11 +32,11 @@ namespace Api.Controllers
 
 
         [HttpPost("get-usuarios")]
-        public ActionResult<List<Usuario>> GetUsuarios()
+        public ActionResult<List<UsuarioTemplate>> GetUsuarios()
         {
             try
             {
-                List <Usuario> usuarios= _usuariosServicio.Listar();
+                List <UsuarioTemplate> usuarios= _usuariosServicio.ListarUsuariosTemplate();
 
                 return Ok(usuarios);
             }

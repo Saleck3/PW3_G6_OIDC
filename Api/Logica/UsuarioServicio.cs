@@ -1,5 +1,6 @@
 ﻿using Api.EF;
 using Api.Entidades;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Logica
 {
@@ -12,8 +13,7 @@ namespace Api.Logica
         List<Usuario> Filtrar(String? username);
         void Eliminar(int id);
         public string getNombreRol(Usuario usuario);
-
-
+        List<UsuarioTemplate> ListarUsuariosTemplate();
     }
 
     public class UsuarioServicio : IUsuarioServicio
@@ -27,7 +27,19 @@ namespace Api.Logica
 
         public List<Usuario> Listar()
         {
-            return _contexto.Usuarios.ToList();
+            return _contexto.Usuarios.Include(t=> t.IdNavigation).ToList();
+        }
+
+        public List<UsuarioTemplate> ListarUsuariosTemplate()
+        {
+             List <Usuario> listado = _contexto.Usuarios.Include(t => t.IdNavigation).ToList();
+             List <UsuarioTemplate> resultado = new List<UsuarioTemplate>();
+            foreach(var usuario in listado)
+            {
+                resultado.Add(new UsuarioTemplate(usuario));
+            }
+
+            return resultado;
         }
         public void Crear(Usuario usuario)
         {

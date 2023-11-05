@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Net.Http.Headers;
 using Web.Entidades;
 using Web.Models;
 
@@ -19,19 +20,19 @@ namespace Web.Controllers
         public async Task<IActionResult> Index()
         {
             addRol();
-            if (ViewBag.rol == "admin")
+            if (getRolFromToken() == "admin")
             {
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["jwt"]);
                 HttpResponseMessage response = await _client.PostAsJsonAsync("Home/get-usuarios", "admin");
                 if (response.IsSuccessStatusCode)
                 {
                     //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
                     List<UsuarioTemplate> usuarios = await response.Content.ReadFromJsonAsync<List<UsuarioTemplate>>();
-                   
-                    return RedirectToAction("ListadoUsuarios", "Home", new { usuarios = JsonConvert.SerializeObject(usuarios) });
+                    //new { usuarios = JsonConvert.SerializeObject(usuarios) }
+                    return View("ListadoUsuarios", usuarios);
                 }
-                ViewBag.error = "El usuario no existe o clave incorrecta";
+                ViewBag.error = "No se pudo obtener la lista de usuarios.";
                 return View();
-                
             }
             else
             {

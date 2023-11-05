@@ -38,14 +38,8 @@
                       @usuario.Username
                     </td>
                     <td>
-
-                        @{
-                            var idRolUsuario = usuario.Rol;
-                            var roles = ViewBag.ListaRoles as List<Rol>;
-                            var rolEncontrado = roles.FirstOrDefault(rol => rol.Id == idRolUsuario);
-
-                        }
-                        @rolEncontrado?.Nombre
+                        @usuario.Rol
+                       
                     </td>
                     <td>
                         <a class="btn btn-danger" href="/home/eliminar/@usuario.Id">Eliminar</a>
