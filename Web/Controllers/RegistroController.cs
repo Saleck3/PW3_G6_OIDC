@@ -17,7 +17,7 @@ namespace Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Agregar(Usuario usuario)
+        public async Task<IActionResult> Registro(Usuario usuario)
         {
             if (!ModelState.IsValid)
             {
@@ -25,15 +25,21 @@ namespace Web.Controllers
             }
 
             HttpResponseMessage responseCreacion = await _client.PostAsJsonAsync("Auth/Registro", usuario);
-            responseCreacion.EnsureSuccessStatusCode();
-
-            HttpResponseMessage response = await _client.PostAsJsonAsync("Auth/login", usuario);
-            response.EnsureSuccessStatusCode();
-
-            //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
-            string token = await response.Content.ReadFromJsonAsync<string>();
-            Response.Cookies.Append("jwt", token, _cookieOptions);
-            return RedirectToAction("Index", "Home");
+            if (responseCreacion.IsSuccessStatusCode)
+            {
+                HttpResponseMessage response = await _client.PostAsJsonAsync("Auth/login", usuario);
+                if (responseCreacion.IsSuccessStatusCode)
+                {
+                    //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
+                    string token = await response.Content.ReadFromJsonAsync<string>();
+                    Response.Cookies.Append("jwt", token, _cookieOptions);
+                    return RedirectToAction("Index", "Home");
+                }
+                ViewBag.error = "No se generar un token para el usuario";
+                return View(usuario);
+            }
+            ViewBag.error = "No se pudo crear el usuario ";
+            return View(usuario);
         }
     }
 }

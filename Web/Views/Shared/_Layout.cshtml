@@ -16,27 +16,23 @@
 </head>
 
 <body class="bg-info">
-    <header class="bg-primary">
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Open ID</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Login" asp-action="Index">Volver al Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Registro" asp-action="Index">Volver al Registro</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
+
+    @{
+        var rol = ViewBag.rol as string;
+    }
+
+    @switch (rol)
+    {
+        //Esto es un code smell? Probablemente
+        //Tendriamos que ver como resolverlo de una manera SOLID? probablemente
+        //Se me ocurre como ahora? Pues no mi ciela
+        case "admin":
+            <text><partial name="/Views/Shared/_menuAdministrador.cshtml"></partial></text>
+            break;
+        default:
+            <text><partial name="/Views/Shared/_menuUsuario.cshtml"></partial></text>
+            break;
+    }
 
     @RenderBody()
 

@@ -34,10 +34,14 @@ public class LoginController : ControllerGenerico
         }
 
         HttpResponseMessage response = await _client.PostAsJsonAsync("Auth/login", usuario);
-        response.EnsureSuccessStatusCode();
-
-        //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
-        string token = await response.Content.ReadFromJsonAsync<string>();
-        return RedirectToAction("Index", "Home");
+        if (response.IsSuccessStatusCode)
+        {
+            //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
+            string token = await response.Content.ReadFromJsonAsync<string>();
+            Response.Cookies.Append("jwt", token, _cookieOptions);
+            return RedirectToAction("Index", "Home");
+        }
+        ViewBag.error = "El usaurio no existe o clave incorrecta";
+        return View(usuario);
     }
 }

@@ -21,7 +21,9 @@ public partial class Usuario
 
     public DateTime? Tokenexpires { get; set; }
 
-    public string? Rol { get; set; }
+    public int? Rol { get; set; }
+
+    public virtual Role IdNavigation { get; set; } = null!;
 
     public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
 }

@@ -8,6 +8,7 @@ using System.Text;
 using Api.Logica;
 using Api.Entidades;
 using Api.EF;
+using Microsoft.AspNetCore.Identity;
 
 namespace Api.Controllers;
 
@@ -19,16 +20,18 @@ public class AuthController : ControllerBase
     private readonly IConfiguration _configuration;
     private IUsuarioServicio _usuariosServicio;
     private IIngresoServicio _ingresoServicio;
+    private IRolesServicio _rolesServicio;
     //private readonly TimeZoneInfo _timeZone;
 
 
-    public AuthController(IConfiguration configuration, IUsuarioServicio uServicio, IIngresoServicio iServicio)//, IUserService userService)
+    public AuthController(IConfiguration configuration, IUsuarioServicio uServicio, IIngresoServicio iServicio,IRolesServicio rolesServicio)
     {
         _configuration = configuration;
         //_userService = userService;
         //_timeZone = timeZone;
         _usuariosServicio = uServicio;
         _ingresoServicio = iServicio;
+        _rolesServicio = rolesServicio;
     }
 
     [HttpPost("Registro")]
@@ -39,6 +42,7 @@ public class AuthController : ControllerBase
             Usuario user = new Usuario();
             CreatePasswordHash(request.Password, ref user);
             user.Username = request.Username;
+            user.Rol = _rolesServicio.getIdRolUser(); 
             _usuariosServicio.Crear(user);
             return Ok(user);
         }
@@ -152,7 +156,7 @@ public class AuthController : ControllerBase
         List<Claim> claims = new List<Claim>
         {
             new Claim("nombre", usuario.Username),
-            new Claim("roles", "Admin")
+            new Claim("roles", _usuariosServicio.getNombreRol(usuario))
         };
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
             _configuration.GetSection("Token").Value));

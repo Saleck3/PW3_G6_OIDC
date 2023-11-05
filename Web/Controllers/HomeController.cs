@@ -4,30 +4,19 @@ using Web.Models;
 
 namespace Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : ControllerGenerico
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<LoginController> logger, IConfiguration configuration) : base(logger, configuration)
         {
-            _logger = logger;
+            
         }
 
         public IActionResult Index()
         {
-            ViewBag.jwt = Request.Cookies["jwt"];
+            addRol();
             return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

@@ -17,6 +17,8 @@ public partial class WebContext : DbContext
 
     public virtual DbSet<Ingreso> Ingresos { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -26,6 +28,8 @@ public partial class WebContext : DbContext
     {
         modelBuilder.Entity<Ingreso>(entity =>
         {
+            entity.HasKey(e => e.Id).HasName("PK__ingreso__3214EC2715EDE654");
+
             entity.ToTable("ingreso");
 
             entity.Property(e => e.Id).HasColumnName("ID");
@@ -41,14 +45,30 @@ public partial class WebContext : DbContext
                 .HasConstraintName("user_id");
         });
 
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__roles__3214EC07FB470251");
+
+            entity.ToTable("roles");
+
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("nombre");
+        });
+
         modelBuilder.Entity<Usuario>(entity =>
         {
+            entity.HasKey(e => e.Id).HasName("PK__usuario__3213E83F6D4E9EE4");
+
             entity.ToTable("usuario");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("id");
             entity.Property(e => e.Password)
                 .HasMaxLength(151)
-                .IsFixedLength()
+                .IsUnicode(false)
                 .HasColumnName("password");
             entity.Property(e => e.Passwordhash).HasMaxLength(100);
             entity.Property(e => e.Passwordsalt)
@@ -58,16 +78,18 @@ public partial class WebContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("refreshtoken");
-            entity.Property(e => e.Rol)
-                .HasMaxLength(10)
-                .IsFixedLength()
-                .HasColumnName("rol");
+            entity.Property(e => e.Rol).HasColumnName("rol");
             entity.Property(e => e.Tokencreated).HasColumnType("datetime");
             entity.Property(e => e.Tokenexpires).HasColumnType("datetime");
             entity.Property(e => e.Username)
                 .HasMaxLength(50)
-                .IsFixedLength()
+                .IsUnicode(false)
                 .HasColumnName("username");
+
+            entity.HasOne(d => d.IdNavigation).WithOne(p => p.Usuario)
+                .HasForeignKey<Usuario>(d => d.Id)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("rol");
         });
 
         OnModelCreatingPartial(modelBuilder);

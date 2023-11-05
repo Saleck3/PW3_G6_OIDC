@@ -5,9 +5,9 @@ namespace Api.EF;
 
 public partial class Ingreso
 {
-    public DateTime Fecha { get; set; }
-
     public int Id { get; set; }
+
+    public DateTime Fecha { get; set; }
 
     public int UserId { get; set; }
 

@@ -15,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<WebContext>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
 builder.Services.AddScoped<IIngresoServicio, IngresoServicio>();
+builder.Services.AddScoped<IRolesServicio, RolesServicio>();
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme

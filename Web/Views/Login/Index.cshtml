@@ -30,6 +30,10 @@
         <div class="text-center fs-1 fw-bold">Login</div>
         <form asp-action="Index">
             <span asp-validation-for="Username" class="text-danger"></span>
+            @if (ViewBag.error != null)
+            {
+                <span class="text-danger">@ViewBag.error</span>
+            }
             <div class="input-group mt-4">
                 <div class="input-group-text bg-info">
                     <img src="/assets/username-icon.svg"

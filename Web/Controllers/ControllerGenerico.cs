@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using Web.Entidades;
 
@@ -19,5 +21,19 @@ public abstract class ControllerGenerico : Controller
         _client.BaseAddress = new Uri(_configuration.GetSection("urls").GetSection("api").Value);
         _client.DefaultRequestHeaders.Accept.Clear();
         _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    }
+    protected void addRol()
+    {
+        //leo JWT y saco el rol
+        string jwtCookie = Request.Cookies["jwt"];
+        if (jwtCookie != null)
+        {
+            JwtSecurityToken jwt = new JwtSecurityTokenHandler().ReadJwtToken(jwtCookie);
+            string rol = jwt.Claims.First(c => c.Type == "roles").Value;
+            //agrego el rol a la vista
+            ViewBag.rol = rol;
+            Response.Cookies.Append("rol", rol, _cookieOptions);
+        }
+
     }
 }

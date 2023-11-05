@@ -10,6 +10,7 @@ namespace Api.Logica
         List<Usuario> Filtrar(int? id);
         List<Usuario> Filtrar(String? username);
         void Eliminar(int id);
+        public string getNombreRol(Usuario usuario);
     }
 
     public class UsuarioServicio : IUsuarioServicio
@@ -21,10 +22,10 @@ namespace Api.Logica
             _contexto = contexto;
         }
 
-        /*public List<UsuarioDt> Listar()
+        public List<Usuario> Listar()
         {
-            return _contexto.UsuarioDts.Include(t => t.Id).ToList();
-        }*/
+            return _contexto.Usuarios.ToList();
+        }
         public void Crear(Usuario usuario)
         {
             _contexto.Usuarios.Add(usuario);
@@ -50,5 +51,11 @@ namespace Api.Logica
                 _contexto.SaveChanges();
             }
         }
+
+        public string getNombreRol(Usuario usuario)
+        {
+            return _contexto.Roles.Where(s => s.Id == usuario.Rol).FirstOrDefault().Nombre;
+        }
+
     }
 }
