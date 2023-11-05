@@ -41,7 +41,7 @@ public class LoginController : ControllerGenerico
             Response.Cookies.Append("jwt", token, _cookieOptions);
             return RedirectToAction("Index", "Home");
         }
-        ViewBag.error = "El usaurio no existe o clave incorrecta";
+        ViewBag.error = "El usuario no existe o clave incorrecta";
         return View(usuario);
     }
 }

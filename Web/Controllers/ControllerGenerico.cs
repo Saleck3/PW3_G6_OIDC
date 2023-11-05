@@ -24,15 +24,26 @@ public abstract class ControllerGenerico : Controller
     }
     protected void addRol()
     {
+        ViewBag.rol = getRolFromToken();        
+
+    }
+
+    protected string getRolFromToken()
+    {
+        JwtSecurityToken jwt = getJWTFromCookie();
+        return jwt.Claims.First(c => c.Type == "roles").Value;
+    }
+    protected JwtSecurityToken getJWTFromCookie()
+    {
         //leo JWT y saco el rol
         string jwtCookie = Request.Cookies["jwt"];
         if (jwtCookie != null)
         {
-            JwtSecurityToken jwt = new JwtSecurityTokenHandler().ReadJwtToken(jwtCookie);
-            string rol = jwt.Claims.First(c => c.Type == "roles").Value;
-            //agrego el rol a la vista
-            ViewBag.rol = rol;
-            Response.Cookies.Append("rol", rol, _cookieOptions);
+            return new JwtSecurityTokenHandler().ReadJwtToken(jwtCookie);
+        }
+        else
+        {
+            return null;
         }
 
     }
