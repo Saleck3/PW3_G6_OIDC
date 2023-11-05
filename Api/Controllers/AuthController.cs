@@ -55,7 +55,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public ActionResult<string> Login(UsuarioDto request)
     {
-        Usuario user = (Usuario)_usuariosServicio.Filtrar(request.Username).First();
+        Usuario user = (Usuario)_usuariosServicio.Filtrar(request.Username);
+
         if (user == null)
         {
             return BadRequest("User not found.");

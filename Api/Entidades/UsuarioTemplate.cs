@@ -13,7 +13,7 @@ namespace Api.Entidades
 
             Id = usuario.Id;
             Username = usuario.Username;
-            Rol = usuario.IdNavigation.Nombre;     }
+            Rol = usuario.RolNavigation.Nombre;     }
 
     }
 }

@@ -9,8 +9,8 @@ namespace Api.Logica
         //List<UsuarioDt> Listar();
         void Crear(Usuario user);
         public List<Usuario> Listar();
-        List<Usuario> Filtrar(int? id);
-        List<Usuario> Filtrar(String? username);
+        Usuario Filtrar(int? id);
+        Usuario Filtrar(String? username);
         void Eliminar(int id);
         public string getNombreRol(Usuario usuario);
         List<UsuarioTemplate> ListarUsuariosTemplate();
@@ -27,12 +27,12 @@ namespace Api.Logica
 
         public List<Usuario> Listar()
         {
-            return _contexto.Usuarios.Include(t=> t.IdNavigation).ToList();
+            return _contexto.Usuarios.Include(t=> t.RolNavigation).ToList();
         }
 
         public List<UsuarioTemplate> ListarUsuariosTemplate()
         {
-             List <Usuario> listado = _contexto.Usuarios.Include(t => t.IdNavigation).ToList();
+             List <Usuario> listado = _contexto.Usuarios.Include(t => t.RolNavigation).ToList();
              List <UsuarioTemplate> resultado = new List<UsuarioTemplate>();
             foreach(var usuario in listado)
             {
@@ -47,14 +47,14 @@ namespace Api.Logica
             _contexto.SaveChanges();
         }
 
-        public List<Usuario> Filtrar(int? idCadena)
+        public Usuario Filtrar(int? idCadena)
         {
-            return _contexto.Usuarios.Where(s => s.Id == idCadena).ToList();
+            return _contexto.Usuarios.Where(s => s.Id == idCadena).First();
         }
 
-        public List<Usuario> Filtrar(String? userName)
+        public Usuario Filtrar(String? userName)
         {
-            return _contexto.Usuarios.Where(s => s.Username == userName).ToList();
+            return _contexto.Usuarios.Where(s => s.Username == userName).FirstOrDefault();
         }
 
         public void Eliminar(int id)

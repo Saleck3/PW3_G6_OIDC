@@ -28,7 +28,7 @@ public partial class WebContext : DbContext
     {
         modelBuilder.Entity<Ingreso>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__ingreso__3214EC2715EDE654");
+            entity.HasKey(e => e.Id).HasName("PK__ingreso__3214EC27764B63D6");
 
             entity.ToTable("ingreso");
 
@@ -42,12 +42,12 @@ public partial class WebContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Ingresos)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("user_id");
+                .HasConstraintName("FK__ingreso__USER_ID__5165187F");
         });
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__roles__3214EC07FB470251");
+            entity.HasKey(e => e.Id).HasName("PK__roles__3214EC07D3F548E2");
 
             entity.ToTable("roles");
 
@@ -59,13 +59,11 @@ public partial class WebContext : DbContext
 
         modelBuilder.Entity<Usuario>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__usuario__3213E83F6D4E9EE4");
+            entity.HasKey(e => e.Id).HasName("PK__usuario__3213E83F69B914CC");
 
             entity.ToTable("usuario");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedOnAdd()
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Password)
                 .HasMaxLength(151)
                 .IsUnicode(false)
@@ -86,10 +84,9 @@ public partial class WebContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("username");
 
-            entity.HasOne(d => d.IdNavigation).WithOne(p => p.Usuario)
-                .HasForeignKey<Usuario>(d => d.Id)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("rol");
+            entity.HasOne(d => d.RolNavigation).WithMany(p => p.Usuarios)
+                .HasForeignKey(d => d.Rol)
+                .HasConstraintName("FK__usuario__rol__4E88ABD4");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -5,6 +5,7 @@ using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using Api.EF;
 using Api.Logica;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +41,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 };
             });
 
-
+builder.Services.AddControllers().AddJsonOptions(x =>x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 //var timeZoneSetting = builder.Configuration["TimeZoneSettings"];
 //var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneSetting);
 //builder.Services.AddSingleton<TimeZoneInfo>(timeZone);

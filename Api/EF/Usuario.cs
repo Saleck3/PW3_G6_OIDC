@@ -23,7 +23,7 @@ public partial class Usuario
 
     public int? Rol { get; set; }
 
-    public virtual Role IdNavigation { get; set; } = null!;
-
     public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
+
+    public virtual Role? RolNavigation { get; set; }
 }
