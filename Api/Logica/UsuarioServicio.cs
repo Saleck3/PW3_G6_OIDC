@@ -7,10 +7,13 @@ namespace Api.Logica
     {
         //List<UsuarioDt> Listar();
         void Crear(Usuario user);
+        public List<Usuario> Listar();
         List<Usuario> Filtrar(int? id);
         List<Usuario> Filtrar(String? username);
         void Eliminar(int id);
         public string getNombreRol(Usuario usuario);
+
+
     }
 
     public class UsuarioServicio : IUsuarioServicio
