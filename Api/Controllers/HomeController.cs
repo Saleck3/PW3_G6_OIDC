@@ -43,8 +43,7 @@ namespace Api.Controllers
             }
             catch (Exception ex)
             {
-
-                return BadRequest("Hubo un error al obtener el listado de usuarios.");
+                return BadRequest("Hubo un error al obtener el listado de usuarios." + ex.Message);
             }
         }
 
@@ -59,8 +58,7 @@ namespace Api.Controllers
             }
             catch (Exception ex)
             {
-
-                return BadRequest("Hubo un error al obtener el listado de roles.");
+                return BadRequest("Hubo un error al obtener el listado de roles. " + ex.Message);
             }
         }
 
@@ -69,14 +67,17 @@ namespace Api.Controllers
         {
             try
             {
-                UsuarioTemplate usuario = _usuariosServicio.Filtrar(Id);
+                UsuarioTemplate usuario = _usuariosServicio.FiltrarUsuarioTemplate(Id);
 
+                if (usuario == null)
+                {
+                    return NotFound();
+                }
                 return Ok(usuario);
             }
             catch (Exception ex)
             {
-
-                return BadRequest("Hubo un error al obtener el usuario.");
+                return BadRequest("Hubo un error al obtener el usuario. " + ex.Message);
             }
         }
 
@@ -98,8 +99,7 @@ namespace Api.Controllers
             }
             catch (Exception ex)
             {
-
-                return BadRequest("Hubo un error al obtener el usuario.");
+                return BadRequest("Hubo un error al obtener el usuario." + ex.Message);
             }
         }
 
@@ -111,7 +111,7 @@ namespace Api.Controllers
                 var nombreUsuarioClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "nombre")?.Value;
                 Boolean usuarioEliminadoOk = _usuariosServicio.Eliminar(Id, usuarioActual: nombreUsuarioClaim);
 
-                if (usuarioEliminadoOk != null && usuarioEliminadoOk)
+                if (usuarioEliminadoOk)
                 {
                     return Ok("El usuario se eliminó correctamente");
                 }
@@ -120,8 +120,7 @@ namespace Api.Controllers
             }
             catch (Exception ex)
             {
-
-                return BadRequest("Hubo un error al eliminar el usuario.");
+                return BadRequest("Hubo un error al eliminar el usuario. " + ex.Message);
             }
         }
 
