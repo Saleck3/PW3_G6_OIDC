@@ -6,7 +6,13 @@
 }
 
 <h1>Listado Usuarios</h1>
+@if (ViewBag.OkMsg != null)
+{
+    <span class="text-success">@ViewBag.OkMsg</span>
+}else if(ViewBag.error != null){
+        <span class="text-danger">@ViewBag.error</span>
 
+}
 
 <table class="table">
     <thead>
@@ -40,7 +46,7 @@
                        
                     </td>
                     <td>
-                        <a class="btn btn-danger" href="/home/eliminar/@usuario.Id">Eliminar</a>
+                        <a class="btn btn-danger" href="/home/Eliminar/@usuario.Id">Eliminar</a>
                         <a class="btn btn-success" href="/home/Editar/@usuario.Id">Editar</a>
                     </td>
                 </tr>

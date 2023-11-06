@@ -88,6 +88,31 @@ namespace Web.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> Eliminar(int Id)
+        {
+            addRol();
+            if (getRolFromToken() == "admin")
+            {
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["jwt"]);
+                HttpResponseMessage response = await _client.PostAsJsonAsync("home/eliminar", Id);
+                if (response.IsSuccessStatusCode)
+                {
+                    @ViewBag.OkMsg = "El usuario se eliminó correctamente";
+
+                    return RedirectToAction("Index", "Home");
+                }
+                ViewBag.error = "No se pudo eliminar, por favor intente de nuevo.";
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ViewBag.error = "No se pudo eliminar, no posee permisos";
+                return View("Index");
+            }
+        }
+
+
         private async Task AgregarRolesAlViewBagAsync()
         {
 

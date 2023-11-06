@@ -13,7 +13,7 @@ namespace Api.Logica
         public Usuario FiltrarDb(int IdUsuario);
         UsuarioTemplate Filtrar(int IdUsuario);
         Usuario Filtrar(String? username);
-        void Eliminar(int id);
+        Boolean Eliminar(int id, string usuarioActual);
         public string getNombreRol(Usuario usuario);
         List<UsuarioTemplate> ListarUsuariosTemplate();
         UsuarioTemplate Editar(UsuarioTemplate usuario);
@@ -85,14 +85,22 @@ namespace Api.Logica
             return _contexto.Usuarios.Where(s => s.Username == userName).FirstOrDefault();
         }
 
-        public void Eliminar(int id)
+        public Boolean Eliminar(int idUsuario, string usuarioActual)
         {
-            var sucursal = _contexto.Usuarios.Find(id);
-            if (sucursal != null)
+            var usuario = _contexto.Usuarios.Include(u => u.Ingresos).FirstOrDefault(u => u.Id == idUsuario);
+
+            if (usuario != null && usuarioActual != usuario.Username && usuario.Id != 1)
             {
-                _contexto.Usuarios.Remove(sucursal);
+                // Eliminar los ingresos asociados al usuario
+                _contexto.Ingresos.RemoveRange(usuario.Ingresos);
+
+                // Eliminar el usuario
+                _contexto.Usuarios.Remove(usuario);
+
                 _contexto.SaveChanges();
+                return true;
             }
+            return false;
         }
 
         public string getNombreRol(Usuario usuario)

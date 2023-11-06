@@ -5,6 +5,7 @@ using Api.EF;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
+using System.Security.Claims;
 
 namespace Api.Controllers
 {
@@ -36,7 +37,7 @@ namespace Api.Controllers
         {
             try
             {
-                List <UsuarioTemplate> usuarios= _usuariosServicio.ListarUsuariosTemplate();
+                List<UsuarioTemplate> usuarios = _usuariosServicio.ListarUsuariosTemplate();
 
                 return Ok(usuarios);
             }
@@ -64,7 +65,7 @@ namespace Api.Controllers
         }
 
         [HttpPost("get-info-usuario")]
-        public ActionResult<UsuarioTemplate> GetUsuario([FromBody]int Id)
+        public ActionResult<UsuarioTemplate> GetUsuario([FromBody] int Id)
         {
             try
             {
@@ -86,9 +87,9 @@ namespace Api.Controllers
             {
                 UsuarioTemplate usuarioEditado = _usuariosServicio.Editar(usuario);
 
-                if(usuarioEditado != null)
+                if (usuarioEditado != null)
                 {
-                    
+
 
                     return Ok("El usuario se editó correctamente");
                 }
@@ -99,6 +100,28 @@ namespace Api.Controllers
             {
 
                 return BadRequest("Hubo un error al obtener el usuario.");
+            }
+        }
+
+        [HttpPost("eliminar")]
+        public ActionResult<string> Eliminar([FromBody] int Id)
+        {
+            try
+            {
+                var nombreUsuarioClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "nombre")?.Value;
+                Boolean usuarioEliminadoOk = _usuariosServicio.Eliminar(Id, usuarioActual: nombreUsuarioClaim);
+
+                if (usuarioEliminadoOk != null && usuarioEliminadoOk)
+                {
+                    return Ok("El usuario se eliminó correctamente");
+                }
+
+                return BadRequest("Hubo un error al eliminar el usuario.");
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest("Hubo un error al eliminar el usuario.");
             }
         }
 
