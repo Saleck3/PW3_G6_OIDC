@@ -14,6 +14,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<WebContext>();
+builder.Services.AddDbContext<WebContext>();
 builder.Services.AddScoped<IUsuarioServicio, UsuarioServicio>();
 builder.Services.AddScoped<IIngresoServicio, IngresoServicio>();
 builder.Services.AddScoped<IRolesServicio, RolesServicio>();
@@ -41,12 +42,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 };
             });
 
+//Fix a loop de users y roles en el registro
 builder.Services.AddControllers().AddJsonOptions(x =>x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-//var timeZoneSetting = builder.Configuration["TimeZoneSettings"];
-//var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneSetting);
-//builder.Services.AddSingleton<TimeZoneInfo>(timeZone);
 
-builder.Services.AddDbContext<WebContext>();
+
 
 var app = builder.Build();
 
