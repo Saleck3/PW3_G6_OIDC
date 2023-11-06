@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http.Headers;
 using Web.Entidades;
 using Web.Models;
@@ -13,7 +14,7 @@ namespace Web.Controllers
 
         public HomeController(ILogger<LoginController> logger, IConfiguration configuration) : base(logger, configuration)
         {
-            
+
         }
 
         [HttpGet]
@@ -27,11 +28,10 @@ namespace Web.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
-                    List<UsuarioTemplate> usuarios = await response.Content.ReadFromJsonAsync<List<UsuarioTemplate>>();
-                    //new { usuarios = JsonConvert.SerializeObject(usuarios) }
+                    List<UsuarioTemplate>? usuarios = await response.Content.ReadFromJsonAsync<List<UsuarioTemplate>>();
                     return View("ListadoUsuarios", usuarios);
                 }
-                ViewBag.error = "No se pudo obtener la lista de usuarios.";
+                TempData["error"] = "No se pudo obtener la lista de usuarios.";
                 return View();
             }
             else
@@ -50,17 +50,23 @@ namespace Web.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
-                    UsuarioTemplate usuario = await response.Content.ReadFromJsonAsync<UsuarioTemplate>();
+                    UsuarioTemplate? usuario = await response.Content.ReadFromJsonAsync<UsuarioTemplate>();
 
                     await AgregarRolesAlViewBagAsync();
-                    return View("Editar", usuario);
+                    return View(usuario);
                 }
-                ViewBag.error = "No se pudo obtener la lista de usuarios.";
-                return View();
+                if (response.StatusCode.Equals(HttpStatusCode.NotFound))
+                {
+                    TempData["error"] = $"No se encontro el usuario con Id {Id}";
+                    return RedirectToAction("Index");
+                }
+                TempData["error"] = $"No se pudo obtener el usuario.";
+                return RedirectToAction("Index");
             }
             else
             {
-                return View();
+                TempData["error"] = "Se necesita permiso de admin para realizar esta accion";
+                return RedirectToAction("Index");
             }
         }
 
@@ -74,16 +80,17 @@ namespace Web.Controllers
                 HttpResponseMessage response = await _client.PostAsJsonAsync("home/editar", usuario);
                 if (response.IsSuccessStatusCode)
                 {
-                    @ViewBag.OkMsg = "El usuario se editó correctamente";
+                    TempData["OkMsg"] = "El usuario se editó correctamente";
 
                     return View("Index");
                 }
-                ViewBag.error = "No se pudo editar correctamente, por favor intente de nuevo.";
-                return View();
+                TempData["error"] = "No se pudo editar correctamente, por favor intente de nuevo.";
+                await AgregarRolesAlViewBagAsync();
+                return View(usuario);
             }
             else
             {
-                return View();
+                return View(usuario);
             }
         }
 
@@ -98,16 +105,16 @@ namespace Web.Controllers
                 HttpResponseMessage response = await _client.PostAsJsonAsync("home/eliminar", Id);
                 if (response.IsSuccessStatusCode)
                 {
-                    @ViewBag.OkMsg = "El usuario se eliminó correctamente";
+                    TempData["OkMsg"] = "El usuario se eliminó correctamente";
 
                     return RedirectToAction("Index", "Home");
                 }
-                ViewBag.error = "No se pudo eliminar, por favor intente de nuevo.";
+                TempData["error"] = "No se pudo eliminar, por favor intente de nuevo.";
                 return RedirectToAction("Index", "Home");
             }
             else
             {
-                ViewBag.error = "No se pudo eliminar, no posee permisos";
+                TempData["error"] = "No se pudo eliminar, no posee permisos";
                 return View("Index");
             }
         }
@@ -115,7 +122,6 @@ namespace Web.Controllers
 
         private async Task AgregarRolesAlViewBagAsync()
         {
-
             try
             {
                 HttpResponseMessage response = await _client.PostAsJsonAsync("Home/get-roles", "admin");
@@ -123,19 +129,20 @@ namespace Web.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var rolesJson = await response.Content.ReadAsStringAsync();
-                    List<Rol> roles = JsonConvert.DeserializeObject<List<Rol>>(rolesJson);
+                    List<Rol>? roles = JsonConvert.DeserializeObject<List<Rol>>(rolesJson);
 
                     ViewBag.ListaRoles = roles;
                 }
                 else
                 {
-                    ViewBag.ListaRoles = null; // En caso de que la respuesta no sea exitosa
+                    TempData["error"] = "La respuesta de la app no arrojo un 200";
+                    ViewBag.ListaRoles = null;
                 }
             }
             catch (Exception ex)
             {
-                // Manejo de excepciones
-                ViewBag.ListaRoles = null; // Puedes manejar el error de la manera que prefieras
+                TempData["error"] = ex.Message;
+                ViewBag.ListaRoles = null;
             }
         }
 
