@@ -62,5 +62,45 @@ namespace Api.Controllers
                 return BadRequest("Hubo un error al obtener el listado de roles.");
             }
         }
+
+        [HttpPost("get-info-usuario")]
+        public ActionResult<UsuarioTemplate> GetUsuario([FromBody]int Id)
+        {
+            try
+            {
+                UsuarioTemplate usuario = _usuariosServicio.Filtrar(Id);
+
+                return Ok(usuario);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest("Hubo un error al obtener el usuario.");
+            }
+        }
+
+        [HttpPost("editar")]
+        public ActionResult<string> Editar([FromBody] UsuarioTemplate usuario)
+        {
+            try
+            {
+                UsuarioTemplate usuarioEditado = _usuariosServicio.Editar(usuario);
+
+                if(usuarioEditado != null)
+                {
+                    
+
+                    return Ok("El usuario se editó correctamente");
+                }
+
+                return BadRequest("Hubo un error al editar el usuario.");
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest("Hubo un error al obtener el usuario.");
+            }
+        }
+
     }
 }

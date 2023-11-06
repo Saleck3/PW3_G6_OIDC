@@ -6,14 +6,16 @@ namespace Api.Entidades
     {
         public int? Id { get; set; }
         public string Username { get; set; } = string.Empty;
-        public string? Rol { get; set; } 
-
+        public string? Rol { get; set; }
+        public int? IdRol { get; set; }
 
         public UsuarioTemplate(Usuario usuario) {
 
             Id = usuario.Id;
             Username = usuario.Username;
-            Rol = usuario.RolNavigation.Nombre;     }
+            Rol = usuario.RolNavigation.Nombre;     
+            IdRol = usuario.RolNavigation.Id;
+        }
 
     }
 }

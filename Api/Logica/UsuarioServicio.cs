@@ -1,6 +1,7 @@
 ﻿using Api.EF;
 using Api.Entidades;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Api.Logica
 {
@@ -9,11 +10,13 @@ namespace Api.Logica
         //List<UsuarioDt> Listar();
         void Crear(Usuario user);
         public List<Usuario> Listar();
-        Usuario Filtrar(int? id);
+        public Usuario FiltrarDb(int IdUsuario);
+        UsuarioTemplate Filtrar(int IdUsuario);
         Usuario Filtrar(String? username);
         void Eliminar(int id);
         public string getNombreRol(Usuario usuario);
         List<UsuarioTemplate> ListarUsuariosTemplate();
+        UsuarioTemplate Editar(UsuarioTemplate usuario);
     }
 
     public class UsuarioServicio : IUsuarioServicio
@@ -47,9 +50,34 @@ namespace Api.Logica
             _contexto.SaveChanges();
         }
 
-        public Usuario Filtrar(int? idCadena)
+        public WebContext Get_contexto()
         {
-            return _contexto.Usuarios.Where(s => s.Id == idCadena).First();
+            return _contexto;
+        }
+
+        public UsuarioTemplate Filtrar(int IdUsuario)
+        {
+            var usuario = _contexto.Usuarios.Include(t => t.RolNavigation).FirstOrDefault(u => u.Id == IdUsuario);
+
+            if (usuario != null)
+            {
+                UsuarioTemplate usuarioTemplate = new UsuarioTemplate(usuario);
+                return usuarioTemplate;
+            }
+
+            return null; // Maneja el caso donde el usuario no se encuentra en la base de datos
+        }
+
+        public Usuario FiltrarDb(int IdUsuario)
+        {
+            Usuario usuario = _contexto.Usuarios.Include(t => t.RolNavigation).FirstOrDefault(u => u.Id == IdUsuario);
+
+            if (usuario != null)
+            {
+                return usuario;
+            }
+
+            return null; // Maneja el caso donde el usuario no se encuentra en la base de datos
         }
 
         public Usuario Filtrar(String? userName)
@@ -70,6 +98,24 @@ namespace Api.Logica
         public string getNombreRol(Usuario usuario)
         {
             return _contexto.Roles.Where(s => s.Id == usuario.Rol).FirstOrDefault().Nombre;
+        }
+
+
+        public UsuarioTemplate Editar(UsuarioTemplate usuario)
+        {
+
+            var usuarioEncontrado = FiltrarDb(usuario.Id ?? 0);
+            
+
+            if(usuarioEncontrado != null)
+            {
+                usuarioEncontrado.Username = usuario.Username;
+                usuarioEncontrado.RolNavigation = _contexto.Roles.FirstOrDefault(r => r.Nombre == usuario.Rol);
+                _contexto.SaveChanges();
+
+                return new UsuarioTemplate(usuarioEncontrado);
+            }
+            return null;
         }
 
     }

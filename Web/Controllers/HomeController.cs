@@ -40,13 +40,51 @@ namespace Web.Controllers
             }
         }
 
-
-        public async Task<ActionResult> ListadoUsuarios(string usuarios)
+        [HttpGet]
+        public async Task<IActionResult> Editar(int Id)
         {
-            var usuariosList = JsonConvert.DeserializeObject<List<UsuarioTemplate>>(usuarios);
-            await AgregarRolesAlViewBagAsync();
+            if (getRolFromToken() == "admin")
+            {
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["jwt"]);
+                HttpResponseMessage response = await _client.PostAsJsonAsync("Home/get-info-usuario", Id);
+                if (response.IsSuccessStatusCode)
+                {
+                    //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
+                    UsuarioTemplate usuario = await response.Content.ReadFromJsonAsync<UsuarioTemplate>();
 
-            return View(usuariosList ?? new List<UsuarioTemplate>());
+                    await AgregarRolesAlViewBagAsync();
+                    return View("Editar", usuario);
+                }
+                ViewBag.error = "No se pudo obtener la lista de usuarios.";
+                return View();
+            }
+            else
+            {
+                return View();
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Editar(UsuarioTemplate usuario)
+        {
+            addRol();
+            if (getRolFromToken() == "admin")
+            {
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["jwt"]);
+                HttpResponseMessage response = await _client.PostAsJsonAsync("home/editar", usuario);
+                if (response.IsSuccessStatusCode)
+                {
+                    @ViewBag.OkMsg = "El usuario se editó correctamente";
+
+                    return View("Index");
+                }
+                ViewBag.error = "No se pudo editar correctamente, por favor intente de nuevo.";
+                return View();
+            }
+            else
+            {
+                return View();
+            }
         }
 
 
@@ -75,5 +113,7 @@ namespace Web.Controllers
                 ViewBag.ListaRoles = null; // Puedes manejar el error de la manera que prefieras
             }
         }
+
+
     }
 }

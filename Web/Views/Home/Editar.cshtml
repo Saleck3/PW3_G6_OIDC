@@ -1,0 +1,52 @@
+﻿
+@model Web.Entidades.UsuarioTemplate
+
+<h1>Editar</h1>
+
+<h4>Edición de Usuario</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form  action="/Home/Editar" method="post">
+            <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <input  name="Id" class="form-control" readonly value="@Model.Id" />
+                <span asp-validation-for="Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Username" class="control-label"></label>
+                <input class="form-control" name="Username" value="@(Model != null ? Model.Username : null)" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rol" class="control-label">Rol</label>
+                <select id="Rol" name="Rol">
+                    @{
+                        var rolExistente = Model.Rol as string;
+                    }
+                    <option value="">-</option>
+                    @foreach (var rol in ViewBag.ListaRoles)
+                    {
+                        <option value="@rol?.Id"
+                            selected="@(rolExistente != null && rolExistente == rol.Nombre ? "selected" : null)">
+                            @rol?.Nombre
+                        </option>
+                    }
+
+                </select>
+                <span asp-validation-for="Rol" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
