@@ -22,9 +22,13 @@
     <form method="post">
         <div class="bg-white p-5 rounded-5 text-secondary shadow"
              style="width: 25rem">
-            @if (ViewBag.error != null)
+            @if (TempData.Peek("OkMsg") != null)
             {
-                <span class="text-danger">@ViewBag.error</span>
+                <span class="text-success">@TempData["OkMsg"]</span>
+            }
+            @if (TempData.Peek("error") != null)
+            {
+                <span class="text-danger">@TempData["error"]</span>
             }
             <div class="form-group mt-4">
                 <label for="Username" class="form-label mt-4 text-primary">Usuario</label>

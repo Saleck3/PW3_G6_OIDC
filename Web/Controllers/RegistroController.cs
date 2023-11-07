@@ -7,7 +7,7 @@ namespace Web.Controllers
 {
     public class RegistroController : ControllerGenerico
     {
-        public RegistroController(ILogger<LoginController> logger, IConfiguration configuration) : base(logger, configuration)
+        public RegistroController( IConfiguration configuration) : base( configuration)
         {
         }
 
@@ -35,10 +35,10 @@ namespace Web.Controllers
                     Response.Cookies.Append("jwt", token, _cookieOptions);
                     return RedirectToAction("Index", "Home");
                 }
-                ViewBag.error = "No se generar un token para el usuario";
+                TempData["error"] = "No se generar un token para el usuario";
                 return View(usuario);
             }
-            ViewBag.error = "No se pudo crear el usuario ";
+            TempData["error"] = "No se pudo crear el usuario ";
             return View(usuario);
         }
     }

@@ -10,7 +10,7 @@ namespace Web.Controllers;
 
 public class LoginController : ControllerGenerico
 {
-    public LoginController(ILogger<LoginController> logger, IConfiguration configuration) : base(logger, configuration)
+    public LoginController(IConfiguration configuration) : base(configuration)
     {
     }
 
@@ -37,11 +37,14 @@ public class LoginController : ControllerGenerico
         if (response.IsSuccessStatusCode)
         {
             //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
-            string token = await response.Content.ReadFromJsonAsync<string>();
-            Response.Cookies.Append("jwt", token, _cookieOptions);
+            string? token = await response.Content.ReadFromJsonAsync<string>();
+            if (token != null)
+            {
+                Response.Cookies.Append("jwt", token, _cookieOptions);
+            }
             return RedirectToAction("Index", "Home");
         }
-        ViewBag.error = "El usuario no existe o clave incorrecta";
+        TempData["error"] = "El usuario no existe o clave incorrecta";
         return View(usuario);
     }
 }

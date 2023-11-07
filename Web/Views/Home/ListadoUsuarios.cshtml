@@ -6,10 +6,17 @@
 }
 
 <h1>Listado Usuarios</h1>
+<hr />
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (TempData.Peek("OkMsg") != null)
+{
+    <span class="text-success">@TempData["OkMsg"]</span>
+}
+@if (TempData.Peek("error") != null)
+{
+    <span class="text-danger">@TempData["error"]</span>
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -32,27 +39,28 @@
             {
                 <tr>
                     <td>
-                      @usuario.Id
+                        @usuario.Id
                     </td>
                     <td>
-                      @usuario.Username
+                        @usuario.Username
                     </td>
                     <td>
                         @usuario.Rol
-                       
                     </td>
                     <td>
-                        <a class="btn btn-danger" href="/home/eliminar/@usuario.Id">Eliminar</a>
-                        <a class="btn btn-success" href="/home/editar/@usuario.Id">Editar</a>
+                        <a class="btn btn-success" href="/home/Editar/@usuario.Id">Editar</a>
+                        <a class="btn btn-danger" href="/home/Eliminar/@usuario.Id">Eliminar</a>
                     </td>
                 </tr>
             }
-        
-        }else{
-             <tr>
-                 <td><h5>No hay resultados de usuarios.</h5></td>
+
+        }
+        else
+        {
+            <tr>
+                <td><h5>No hay resultados de usuarios.</h5></td>
             </tr>
         }
-        
+
     </tbody>
 </table>

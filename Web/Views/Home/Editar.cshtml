@@ -1,0 +1,58 @@
+﻿@model Web.Entidades.UsuarioTemplate
+
+<div class="container">
+    <h1>Editar</h1>
+
+    <h4>Edición de Usuario</h4>
+    <hr />
+    @if (TempData.Peek("OkMsg") != null)
+    {
+        <span class="text-success">@TempData["OkMsg"]</span>
+    }
+    @if (TempData.Peek("error") != null)
+    {
+        <span class="text-danger">@TempData["error"]</span>
+    }
+
+    <div class="col-md-8">
+        <form action="/Home/Editar" method="post" class="container">
+            <div class="form-group">
+                <label asp-for="Id" class="form-label"></label>
+                <input name="Id" class="form-control" readonly value="@Model.Id" />
+                <span asp-validation-for="Id" class="text-danger"></span>
+            
+                <label asp-for="Username" class="form-label"></label>
+                <input class="form-control" name="Username" value="@(Model != null ? Model.Username : null)" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+                
+                <label asp-for="Rol" class="form-label">Rol</label>
+                <select id="Rol" name="Rol" class="form-control">
+                    @{
+                        string? rolActual = Model.Rol as string;
+                    }
+                    <option value="">-</option>
+                    @foreach (var rol in ViewBag.ListaRoles)
+                    {
+                        <option value="@rol?.Nombre"
+                                selected="@(rolActual != null && rolActual == rol.Nombre ? "selected" : null)">
+                            @rol?.Nombre
+                        </option>
+                    }
+
+                </select>
+                <span asp-validation-for="Rol" class="text-danger"></span>
+            </div>
+            <div class="m-3">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <a class="btn btn-secondary" asp-action="Index">Volver al listado</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -3,12 +3,10 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Data;
 using System.Text;
 using Api.Logica;
 using Api.Entidades;
 using Api.EF;
-using Microsoft.AspNetCore.Identity;
 
 namespace Api.Controllers;
 
@@ -24,7 +22,7 @@ public class AuthController : ControllerBase
     //private readonly TimeZoneInfo _timeZone;
 
 
-    public AuthController(IConfiguration configuration, IUsuarioServicio uServicio, IIngresoServicio iServicio,IRolesServicio rolesServicio)
+    public AuthController(IConfiguration configuration, IUsuarioServicio uServicio, IIngresoServicio iServicio, IRolesServicio rolesServicio)
     {
         _configuration = configuration;
         //_userService = userService;
@@ -42,7 +40,7 @@ public class AuthController : ControllerBase
             Usuario user = new Usuario();
             CreatePasswordHash(request.Password, ref user);
             user.Username = request.Username;
-            user.Rol = _rolesServicio.getIdRolUser(); 
+            user.Rol = _rolesServicio.getIdRolUser();
             _usuariosServicio.Crear(user);
             return Ok(user);
         }
@@ -70,10 +68,8 @@ public class AuthController : ControllerBase
         RegistrarIngreso(ref user);
 
         string token = CreateToken(ref user);
-
         var refreshToken = GenerateRefreshToken();
         SetRefreshToken(refreshToken, ref user);
-
         return Ok(token);
     }
 
@@ -107,8 +103,8 @@ public class AuthController : ControllerBase
     [HttpPost("refresh-token")]
     public ActionResult<string> RefreshToken(Usuario user)
     {
-        var refreshToken = Request.Cookies["refreshToken"];
-        if (!user.Refreshtoken.Equals(refreshToken))
+        string? refreshToken = Request.Cookies["refreshToken"];
+        if (refreshToken != null && user.Refreshtoken != null && !user.Refreshtoken.Equals(refreshToken))
         {
             return Unauthorized("Refresh Token inválido");
         }
@@ -137,6 +133,11 @@ public class AuthController : ControllerBase
 
     private bool VerifyPasswordHash(string password, ref Usuario user)
     {
+        if (
+            string.IsNullOrEmpty(password)
+            || string.IsNullOrEmpty(user.Password)
+            || user.Passwordsalt == null
+            || user.Passwordhash == null) { return false; }
         using (var hmac = new HMACSHA512(user.Passwordsalt))
         {
             var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
@@ -157,6 +158,7 @@ public class AuthController : ControllerBase
         List<Claim> claims = new List<Claim>
         {
             new Claim("nombre", usuario.Username),
+            new Claim("Id", usuario.Id.ToString()),
             new Claim("roles", _usuariosServicio.getNombreRol(usuario))
         };
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(

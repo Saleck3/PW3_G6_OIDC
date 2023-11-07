@@ -2,9 +2,7 @@
 using Api.Logica;
 using Api.Entidades;
 using Api.EF;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
-using System.Data;
 
 namespace Api.Controllers
 {
@@ -31,19 +29,18 @@ namespace Api.Controllers
         }
 
 
-        [HttpPost("get-usuarios")]
+        [HttpGet("get-usuarios")]
         public ActionResult<List<UsuarioTemplate>> GetUsuarios()
         {
             try
             {
-                List <UsuarioTemplate> usuarios= _usuariosServicio.ListarUsuariosTemplate();
+                List<UsuarioTemplate> usuarios = _usuariosServicio.ListarUsuariosTemplate();
 
                 return Ok(usuarios);
             }
             catch (Exception ex)
             {
-
-                return BadRequest("Hubo un error al obtener el listado de usuarios.");
+                return BadRequest("Hubo un error al obtener el listado de usuarios." + ex.Message);
             }
         }
 
@@ -58,9 +55,74 @@ namespace Api.Controllers
             }
             catch (Exception ex)
             {
-
-                return BadRequest("Hubo un error al obtener el listado de roles.");
+                return BadRequest("Hubo un error al obtener el listado de roles. " + ex.Message);
             }
         }
+
+        [HttpGet("get-info-usuario")]
+        public ActionResult<UsuarioTemplate> GetUsuario(int Id)
+        {
+            try
+            {
+                UsuarioTemplate usuario = _usuariosServicio.FiltrarUsuarioTemplate(Id);
+
+                if (usuario == null)
+                {
+                    return NotFound();
+                }
+                return Ok(usuario);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Hubo un error al obtener el usuario. " + ex.Message);
+            }
+        }
+
+        [HttpPost("editar")]
+        public ActionResult<string> Editar([FromBody] UsuarioTemplate usuario)
+        {
+            try
+            {
+                UsuarioTemplate usuarioEditado = _usuariosServicio.Editar(usuario);
+
+                if (usuarioEditado != null)
+                {
+                    return Ok("El usuario se editó correctamente");
+                }
+
+                return BadRequest("Hubo un error al editar el usuario.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Hubo un error al obtener el usuario." + ex.Message);
+            }
+        }
+
+        [HttpPost("eliminar")]
+        public ActionResult<string> Eliminar([FromBody] int Id)
+        {
+            try
+            {
+                string? usuarioActual = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "nombre")?.Value;
+                if (usuarioActual == null)
+                {
+                    return NotFound();
+                }
+
+                Boolean usuarioEliminadoOk = _usuariosServicio.Eliminar(Id, usuarioActual);
+
+                if (usuarioEliminadoOk)
+                {
+                    return Ok("El usuario se eliminó correctamente");
+                }
+
+                return BadRequest("Hubo un error al eliminar el usuario.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Hubo un error al eliminar el usuario. " + ex.Message);
+            }
+        }
+
     }
 }

@@ -5,9 +5,13 @@
 
 <h1 class="display-4">Bienvenid@@</h1>
 
-@if (ViewBag.error != null)
+@if (TempData.Peek("OkMsg") != null)
 {
-    <span class="text-danger">@ViewBag.error</span>
+    <span class="text-success">@TempData["OkMsg"]</span>
+}
+@if (TempData.Peek("error") != null)
+{
+    <span class="text-danger">@TempData["error"]</span>
 }
 <div style="width:90%;">
     <p>Este es un proyecto para el trabajo practico</p>
