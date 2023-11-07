@@ -9,7 +9,7 @@ public interface IUsuarioServicio
     //List<UsuarioDt> Listar();
     void Crear(Usuario user);
     public List<Usuario> Listar();
-    public Usuario FiltrarUsuario(int IdUsuario);
+    public Usuario? FiltrarUsuario(int? IdUsuario);
     UsuarioTemplate FiltrarUsuarioTemplate(int IdUsuario);
     Usuario Filtrar(String? username);
     Boolean Eliminar(int id, string usuarioActual);
@@ -67,8 +67,12 @@ public class UsuarioServicio : IUsuarioServicio
         return null; // Maneja el caso donde el usuario no se encuentra en la base de datos
     }
 
-    public Usuario FiltrarUsuario(int IdUsuario)
+    public Usuario? FiltrarUsuario(int? IdUsuario)
     {
+        if(IdUsuario == null)
+        {
+            return null;
+        }
         Usuario usuario = _contexto.Usuarios.Include(t => t.RolNavigation).FirstOrDefault(u => u.Id == IdUsuario);
 
         if (usuario != null)
@@ -111,7 +115,7 @@ public class UsuarioServicio : IUsuarioServicio
     public UsuarioTemplate Editar(UsuarioTemplate usuario)
     {
 
-        var usuarioEncontrado = FiltrarUsuario(usuario.Id ?? 0);
+        var usuarioEncontrado = FiltrarUsuario(usuario.Id);
 
 
         if (usuarioEncontrado != null)

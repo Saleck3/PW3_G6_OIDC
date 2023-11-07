@@ -2,10 +2,7 @@
 using Api.Logica;
 using Api.Entidades;
 using Api.EF;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
-using System.Data;
-using System.Security.Claims;
 
 namespace Api.Controllers
 {
@@ -32,7 +29,7 @@ namespace Api.Controllers
         }
 
 
-        [HttpPost("get-usuarios")]
+        [HttpGet("get-usuarios")]
         public ActionResult<List<UsuarioTemplate>> GetUsuarios()
         {
             try
@@ -51,7 +48,7 @@ namespace Api.Controllers
         public ActionResult<List<Role>> GetRoles()
         {
             try
-            {
+            { 
                 List<Role> roles = _rolesServicio.Listar();
 
                 return Ok(roles);
@@ -62,8 +59,8 @@ namespace Api.Controllers
             }
         }
 
-        [HttpPost("get-info-usuario")]
-        public ActionResult<UsuarioTemplate> GetUsuario([FromBody] int Id)
+        [HttpGet("get-info-usuario")]
+        public ActionResult<UsuarioTemplate> GetUsuario(int Id)
         {
             try
             {
@@ -90,8 +87,6 @@ namespace Api.Controllers
 
                 if (usuarioEditado != null)
                 {
-
-
                     return Ok("El usuario se editó correctamente");
                 }
 

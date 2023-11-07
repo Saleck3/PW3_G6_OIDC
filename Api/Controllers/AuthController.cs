@@ -3,12 +3,10 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Data;
 using System.Text;
 using Api.Logica;
 using Api.Entidades;
 using Api.EF;
-using Microsoft.AspNetCore.Identity;
 
 namespace Api.Controllers;
 
@@ -70,10 +68,8 @@ public class AuthController : ControllerBase
         RegistrarIngreso(ref user);
 
         string token = CreateToken(ref user);
-
         var refreshToken = GenerateRefreshToken();
         SetRefreshToken(refreshToken, ref user);
-
         return Ok(token);
     }
 

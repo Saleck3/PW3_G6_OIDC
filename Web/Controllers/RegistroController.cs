@@ -7,7 +7,7 @@ namespace Web.Controllers
 {
     public class RegistroController : ControllerGenerico
     {
-        public RegistroController(ILogger<LoginController> logger, IConfiguration configuration) : base(logger, configuration)
+        public RegistroController( IConfiguration configuration) : base( configuration)
         {
         }
 

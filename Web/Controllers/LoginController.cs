@@ -10,7 +10,7 @@ namespace Web.Controllers;
 
 public class LoginController : ControllerGenerico
 {
-    public LoginController(ILogger<LoginController> logger, IConfiguration configuration) : base(logger, configuration)
+    public LoginController(IConfiguration configuration) : base(configuration)
     {
     }
 

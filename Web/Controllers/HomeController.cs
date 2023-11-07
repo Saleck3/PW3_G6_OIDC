@@ -10,9 +10,8 @@ namespace Web.Controllers
 {
     public class HomeController : ControllerGenerico
     {
-        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<LoginController> logger, IConfiguration configuration) : base(logger, configuration)
+        public HomeController(IConfiguration configuration) : base(configuration)
         {
 
         }
@@ -24,14 +23,18 @@ namespace Web.Controllers
             if (getRolFromToken() == "admin")
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["jwt"]);
-                HttpResponseMessage response = await _client.PostAsJsonAsync("Home/get-usuarios", "admin");
+                HttpResponseMessage response = await _client.GetAsync("Home/get-usuarios");
                 if (response.IsSuccessStatusCode)
                 {
                     //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
                     List<UsuarioTemplate>? usuarios = await response.Content.ReadFromJsonAsync<List<UsuarioTemplate>>();
                     return View("ListadoUsuarios", usuarios);
                 }
-                TempData["error"] = "No se pudo obtener la lista de usuarios.";
+                if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+                {
+                    TempData["error"] = "No Autorizado. ";
+                }
+                TempData["error"] += "No se pudo obtener la lista de usuarios.";
                 return View();
             }
             else
@@ -46,7 +49,7 @@ namespace Web.Controllers
             if (getRolFromToken() == "admin")
             {
                 _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["jwt"]);
-                HttpResponseMessage response = await _client.PostAsJsonAsync("Home/get-info-usuario", Id);
+                HttpResponseMessage response = await _client.GetAsync("Home/get-info-usuario?id=" + Id);
                 if (response.IsSuccessStatusCode)
                 {
                     //Aca se "deberia" usar ReadAsStringAsync pero como recibe un JSON pone la respuesta entre comillas y rompe todo
@@ -60,7 +63,11 @@ namespace Web.Controllers
                     TempData["error"] = $"No se encontro el usuario con Id {Id}";
                     return RedirectToAction("Index");
                 }
-                TempData["error"] = $"No se pudo obtener el usuario.";
+                if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+                {
+                    TempData["error"] = "No Autorizado. ";
+                }
+                TempData["error"] += $"No se pudo obtener el usuario.";
                 return RedirectToAction("Index");
             }
             else
@@ -82,14 +89,19 @@ namespace Web.Controllers
                 {
                     TempData["OkMsg"] = "El usuario se editó correctamente";
 
-                    return View("Index");
+                    return RedirectToAction("Index");
                 }
-                TempData["error"] = "No se pudo editar correctamente, por favor intente de nuevo.";
+                if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+                {
+                    TempData["error"] = "No Autorizado. ";
+                }
+                TempData["error"] += "No se pudo editar correctamente, por favor intente de nuevo.";
                 await AgregarRolesAlViewBagAsync();
                 return View(usuario);
             }
             else
             {
+                await AgregarRolesAlViewBagAsync();
                 return View(usuario);
             }
         }
@@ -109,7 +121,11 @@ namespace Web.Controllers
 
                     return RedirectToAction("Index", "Home");
                 }
-                TempData["error"] = "No se pudo eliminar, por favor intente de nuevo.";
+                if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+                {
+                    TempData["error"] = "No Autorizado. ";
+                }
+                TempData["error"] += "No se pudo eliminar, por favor intente de nuevo.";
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -124,7 +140,8 @@ namespace Web.Controllers
         {
             try
             {
-                HttpResponseMessage response = await _client.PostAsJsonAsync("Home/get-roles", "admin");
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["jwt"]);
+                HttpResponseMessage response = await _client.PostAsync("Home/get-roles", null);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -135,7 +152,11 @@ namespace Web.Controllers
                 }
                 else
                 {
-                    TempData["error"] = "La respuesta de la app no arrojo un 200";
+                    if (response.StatusCode.Equals(HttpStatusCode.Unauthorized))
+                    {
+                        TempData["error"] = "No Autorizado. ";
+                    }
+                    TempData["error"] += "Error al agregar los roles al view bag";
                     ViewBag.ListaRoles = null;
                 }
             }
