@@ -69,7 +69,7 @@ public class UsuarioServicio : IUsuarioServicio
 
     public Usuario? FiltrarUsuario(int? IdUsuario)
     {
-        if(IdUsuario == null)
+        if (IdUsuario == null)
         {
             return null;
         }
@@ -96,6 +96,8 @@ public class UsuarioServicio : IUsuarioServicio
         {
             // Eliminar los ingresos asociados al usuario
             _contexto.Ingresos.RemoveRange(usuario.Ingresos);
+
+            _contexto.SaveChanges();
 
             // Eliminar el usuario
             _contexto.Usuarios.Remove(usuario);
