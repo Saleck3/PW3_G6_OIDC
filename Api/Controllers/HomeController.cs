@@ -48,7 +48,7 @@ namespace Api.Controllers
         public ActionResult<List<Role>> GetRoles()
         {
             try
-            { 
+            {
                 List<Role> roles = _rolesServicio.Listar();
 
                 return Ok(roles);
@@ -103,8 +103,13 @@ namespace Api.Controllers
         {
             try
             {
-                var nombreUsuarioClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "nombre")?.Value;
-                Boolean usuarioEliminadoOk = _usuariosServicio.Eliminar(Id, usuarioActual: nombreUsuarioClaim);
+                string? usuarioActual = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "nombre")?.Value;
+                if (usuarioActual == null)
+                {
+                    return NotFound();
+                }
+
+                Boolean usuarioEliminadoOk = _usuariosServicio.Eliminar(Id, usuarioActual);
 
                 if (usuarioEliminadoOk)
                 {

@@ -23,18 +23,32 @@ public abstract class ControllerGenerico : Controller
     }
     protected void addRol()
     {
+        TempData["IdUser"] = getIDFromToken();
         ViewBag.rol = getRolFromToken();
     }
 
-    protected string getRolFromToken()
+    protected string? getIDFromToken()
     {
-        JwtSecurityToken jwt = getJWTFromCookie();
-        return jwt.Claims.First(c => c.Type == "roles").Value;
+        JwtSecurityToken? jwt = getJWTFromCookie();
+        if (jwt != null)
+        {
+            return jwt.Claims.First(c => c.Type == "Id").Value;
+        }
+        return null;
     }
-    protected JwtSecurityToken getJWTFromCookie()
+    protected string? getRolFromToken()
+    {
+        JwtSecurityToken? jwt = getJWTFromCookie();
+        if (jwt != null)
+        {
+            return jwt.Claims.First(c => c.Type == "roles").Value;
+        }
+        return null;
+    }
+    protected JwtSecurityToken? getJWTFromCookie()
     {
         //leo JWT y saco el rol
-        string jwtCookie = Request.Cookies["jwt"];
+        string? jwtCookie = Request.Cookies["jwt"];
         if (jwtCookie != null)
         {
             return new JwtSecurityTokenHandler().ReadJwtToken(jwtCookie);

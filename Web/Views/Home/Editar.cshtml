@@ -26,14 +26,14 @@
                 <span asp-validation-for="Username" class="text-danger"></span>
                 
                 <label asp-for="Rol" class="form-label">Rol</label>
-                <select id="IdRol" name="IdRol" class="form-control">
+                <select id="Rol" name="Rol" class="form-control">
                     @{
-                        var rolActual = Model.Rol as string;
+                        string? rolActual = Model.Rol as string;
                     }
                     <option value="">-</option>
                     @foreach (var rol in ViewBag.ListaRoles)
                     {
-                        <option value="@rol?.Id"
+                        <option value="@rol?.Nombre"
                                 selected="@(rolActual != null && rolActual == rol.Nombre ? "selected" : null)">
                             @rol?.Nombre
                         </option>
