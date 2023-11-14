@@ -4,7 +4,7 @@ namespace Web.Entidades
 {
     public class Usuario
     {
-        [StringLength(25, MinimumLength = 4, ErrorMessage = "La longitud del nombre de usuario debe estar entre 4 y 25 caracteres")]
+        [StringLength(25, MinimumLength = 3, ErrorMessage = "La longitud del nombre de usuario debe estar entre 3 y 25 caracteres")]
         [Required(ErrorMessage = "El nombre de usuario es requerido")]
         public string? Username { get; set; }
 
